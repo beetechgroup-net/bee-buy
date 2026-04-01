@@ -16,7 +16,7 @@ export function Home() {
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-lime-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
       </div>
     );
   }
@@ -42,11 +42,11 @@ export function Home() {
 
       {purchases.length === 0 ? (
         <div className="flex flex-col items-center justify-center p-8 mt-10 bg-white rounded-2xl border border-gray-100 shadow-sm gap-4 text-center">
-          <div className="bg-lime-50 w-16 h-16 rounded-full flex items-center justify-center">
-            <ReceiptText className="w-8 h-8 text-lime-600" />
+          <div className="bg-amber-50 w-16 h-16 rounded-full flex items-center justify-center">
+            <ReceiptText className="w-8 h-8 text-amber-600" />
           </div>
           <div>
-            <h3 className="text-gray-900 font-semibold mb-1">Nenhuma compra listada</h3>
+            <h3 className="text-slate-900 font-semibold mb-1">Nenhuma compra listada</h3>
             <p className="text-gray-500 text-sm">Escaneie um QR Code de Nota Fiscal para começar a organizar seus gastos.</p>
           </div>
         </div>
@@ -60,8 +60,8 @@ export function Home() {
             >
               <div className="flex-1 flex flex-col gap-1">
                 <div className="flex justify-between items-start">
-                  <h3 className="font-semibold text-gray-900 line-clamp-1">{purchase.store.name}</h3>
-                  <span className="font-bold text-gray-900 ml-2">
+                  <h3 className="font-semibold text-slate-900 line-clamp-1">{purchase.store.name}</h3>
+                  <span className="font-bold text-slate-900 ml-2">
                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(purchase.total)}
                   </span>
                 </div>
@@ -78,7 +78,7 @@ export function Home() {
                 </div>
               </div>
               
-              <div className="text-gray-300 group-hover:text-lime-600 transition-colors">
+              <div className="text-gray-300 group-hover:text-amber-600 transition-colors">
                 <ArrowRight className="w-5 h-5" />
               </div>
             </Link>

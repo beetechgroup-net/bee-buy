@@ -63,7 +63,7 @@ export function ScannerPage() {
     <div className="flex flex-col h-full items-center animate-in fade-in duration-300">
       <div className="text-center mb-6 w-full">
         <h2 className="text-2xl font-bold text-gray-800 flex justify-center items-center gap-2">
-          <QrCode className="w-6 h-6 text-lime-600" />
+          <QrCode className="w-6 h-6 text-amber-600" />
           Escanear Nota
         </h2>
         <p className="text-sm text-gray-500 mt-1">Aponte a câmera para o QR Code da NFC-e</p>
@@ -75,10 +75,10 @@ export function ScannerPage() {
         )}
 
         {processing && (
-          <div className="absolute inset-0 bg-lime-900/90 flex flex-col items-center justify-center text-white z-20">
-            <Loader2 className="w-12 h-12 mb-4 animate-spin text-lime-300" />
+          <div className="absolute inset-0 bg-amber-900/90 flex flex-col items-center justify-center text-white z-20">
+            <Loader2 className="w-12 h-12 mb-4 animate-spin text-amber-300" />
             <h3 className="text-xl font-bold">Lendo dados...</h3>
-            <p className="text-sm text-lime-100/80 mt-2 px-8 text-center text-balance">
+            <p className="text-sm text-amber-100/80 mt-2 px-8 text-center text-balance">
               Conectando com a SEFAZ e extraindo os produtos da sua nota.
             </p>
           </div>

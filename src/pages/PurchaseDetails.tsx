@@ -20,7 +20,7 @@ export function PurchaseDetails() {
         <p className="text-gray-500 text-sm mt-2">Esta nota pode ter sido excluída ou não existe.</p>
         <button 
           onClick={() => navigate('/')}
-          className="mt-6 bg-lime-600 text-white font-medium py-2 px-6 rounded-full hover:bg-lime-700 transition"
+          className="mt-6 bg-amber-600 text-white font-medium py-2 px-6 rounded-full hover:bg-amber-700 transition"
         >
           Voltar para Início
         </button>
@@ -49,7 +49,7 @@ export function PurchaseDetails() {
         >
           <ArrowLeft className="w-6 h-6" />
         </button>
-        <h2 className="text-xl font-bold text-gray-900">Detalhes da Compra</h2>
+        <h2 className="text-xl font-bold text-slate-900">Detalhes da Compra</h2>
         <button 
           onClick={handleDelete}
           className="p-2 -mr-2 rounded-full hover:bg-red-50 text-red-500 transition"
@@ -61,13 +61,13 @@ export function PurchaseDetails() {
 
       {/* Store Info Card */}
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-lime-400 to-emerald-500"></div>
-        <h1 className="text-2xl font-bold text-gray-900 mt-2">{purchase.store.name}</h1>
+        <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-amber-400 to-emerald-500"></div>
+        <h1 className="text-2xl font-bold text-slate-900 mt-2">{purchase.store.name}</h1>
         <p className="text-sm text-gray-500 mt-1">CNPJ: {purchase.store.cnpj}</p>
         
         {purchase.store.address && (
           <div className="flex items-start gap-2 mt-4 text-sm text-gray-600">
-            <MapPin className="w-4 h-4 shrink-0 mt-0.5 text-lime-600" />
+            <MapPin className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
             <span className="leading-snug">{purchase.store.address}</span>
           </div>
         )}
@@ -79,7 +79,7 @@ export function PurchaseDetails() {
           <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
             <Calendar className="w-3 h-3" /> Data
           </div>
-          <div className="font-semibold text-gray-900">
+          <div className="font-semibold text-slate-900">
             {format(new Date(purchase.date), "dd/MM/yyyy", { locale: ptBR })}
           </div>
         </div>
@@ -87,7 +87,7 @@ export function PurchaseDetails() {
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
           <div className="text-xs text-gray-500 mb-1">Categoria</div>
           <select 
-            className="w-full bg-transparent font-semibold text-lime-700 outline-none cursor-pointer appearance-none"
+            className="w-full bg-transparent font-semibold text-amber-700 outline-none cursor-pointer appearance-none"
             value={purchase.category}
             onChange={handleCategoryChange}
           >
@@ -103,7 +103,7 @@ export function PurchaseDetails() {
 
       {/* Products List */}
       <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+        <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-slate-50/50">
           <h3 className="font-semibold text-gray-800">Itens da Nota</h3>
           <span className="text-xs font-medium text-gray-500 bg-gray-200 px-2 py-1 rounded-full">
             {purchase.products.length} itens
@@ -113,7 +113,7 @@ export function PurchaseDetails() {
         <div className="divide-y divide-gray-100">
           {purchase.products.length > 0 ? (
             purchase.products.map(product => (
-              <div key={product.id} className="p-4 flex gap-4 hover:bg-gray-50 transition-colors">
+              <div key={product.id} className="p-4 flex gap-4 hover:bg-slate-50 transition-colors">
                 <div className="bg-gray-100 h-10 w-10 shrink-0 rounded-xl flex items-center justify-center font-bold text-gray-400 text-xs">
                   {product.quantity}x
                 </div>
@@ -123,7 +123,7 @@ export function PurchaseDetails() {
                     {product.unit} • {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)} un
                   </p>
                 </div>
-                <div className="font-bold text-gray-900 self-center">
+                <div className="font-bold text-slate-900 self-center">
                   {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price * product.quantity)}
                 </div>
               </div>
@@ -136,9 +136,9 @@ export function PurchaseDetails() {
         </div>
 
         {/* Total Footer */}
-        <div className="p-5 bg-lime-50 border-t border-lime-100 flex justify-between items-end">
-          <span className="text-lime-800 font-medium">Total</span>
-          <span className="text-3xl font-black text-lime-900 tracking-tight">
+        <div className="p-5 bg-amber-50 border-t border-amber-100 flex justify-between items-end">
+          <span className="text-amber-800 font-medium">Total</span>
+          <span className="text-3xl font-black text-amber-900 tracking-tight">
             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(purchase.total)}
           </span>
         </div>
@@ -149,7 +149,7 @@ export function PurchaseDetails() {
           href={purchase.qrCodeUrl} 
           target="_blank" 
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 w-full py-4 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-2xl hover:bg-gray-50 transition shadow-sm"
+          className="flex items-center justify-center gap-2 w-full py-4 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-2xl hover:bg-slate-50 transition shadow-sm"
         >
           <ExternalLink className="w-4 h-4" />
           Ver Nota Original na SEFAZ

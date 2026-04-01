@@ -46,7 +46,7 @@ export function SearchPage() {
         </div>
         <input
           type="text"
-          className="block w-full pl-11 pr-4 py-4 bg-white border border-gray-100 rounded-2xl shadow-sm focus:ring-2 focus:ring-lime-500 focus:border-lime-500 outline-none transition-shadow placeholder:text-gray-400 font-medium text-gray-800"
+          className="block w-full pl-11 pr-4 py-4 bg-white border border-gray-100 rounded-2xl shadow-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-shadow placeholder:text-gray-400 font-medium text-gray-800"
           placeholder="Ex: Arroz, Feijão, Leite..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -69,7 +69,7 @@ export function SearchPage() {
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-gray-600">
-              <thead className="bg-gray-50 text-gray-500 text-xs uppercase" style={{ whiteSpace: 'nowrap' }}>
+              <thead className="bg-slate-50 text-gray-500 text-xs uppercase" style={{ whiteSpace: 'nowrap' }}>
                 <tr>
                   <th className="px-4 py-3 font-semibold">Produto / Local</th>
                   <th className="px-4 py-3 font-semibold text-right">Data</th>
@@ -83,12 +83,12 @@ export function SearchPage() {
                   return (
                     <tr 
                       key={`${p.purchaseId}-${idx}`} 
-                      className={`hover:bg-gray-50 transition-colors ${
-                        isCheapest ? 'bg-lime-50/50' : ''
+                      className={`hover:bg-slate-50 transition-colors ${
+                        isCheapest ? 'bg-amber-50/50' : ''
                       }`}
                     >
                       <td className="px-4 py-3 max-w-[150px]">
-                        <div className="font-semibold text-gray-900 line-clamp-2 leading-tight">
+                        <div className="font-semibold text-slate-900 line-clamp-2 leading-tight">
                           {p.name}
                         </div>
                         <div className="text-xs text-gray-500 mt-1 flex items-center gap-1">
@@ -98,7 +98,7 @@ export function SearchPage() {
                       </td>
                       
                       <td className="px-4 py-3 text-right whitespace-nowrap text-xs">
-                        <div className="text-gray-900 font-medium">
+                        <div className="text-slate-900 font-medium">
                           {format(new Date(p.date), "dd/MM/yy")}
                         </div>
                         <div className="text-gray-500 mt-1 flex justify-end items-center gap-1">
@@ -109,12 +109,12 @@ export function SearchPage() {
                       </td>
                       
                       <td className="px-4 py-3 text-right whitespace-nowrap relative">
-                        <div className={`font-bold ${isCheapest ? 'text-lime-700 text-base' : 'text-gray-900'}`}>
+                        <div className={`font-bold ${isCheapest ? 'text-amber-700 text-base' : 'text-slate-900'}`}>
                           {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(p.price)}
                         </div>
                         
                         {isCheapest && (
-                          <div className="flex items-center justify-end gap-1 text-[10px] font-bold text-lime-600 mt-1 uppercase tracking-wider">
+                          <div className="flex items-center justify-end gap-1 text-[10px] font-bold text-amber-600 mt-1 uppercase tracking-wider">
                             <Award className="w-3 h-3" />
                             Mais barato
                           </div>
@@ -127,7 +127,7 @@ export function SearchPage() {
             </table>
           </div>
           
-          <div className="bg-gray-50 p-3 text-center border-t border-gray-100 text-xs text-gray-500">
+          <div className="bg-slate-50 p-3 text-center border-t border-gray-100 text-xs text-gray-500">
             Foram encontradas {filteredProducts.length} ocorrências desse produto.
           </div>
         </div>
