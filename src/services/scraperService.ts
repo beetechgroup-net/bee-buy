@@ -9,15 +9,21 @@ import { Purchase, Product } from '../types';
 export const scraperService = {
   async processQRCodeUrl(url: string): Promise<Purchase> {
     try {
-      // Trying to use a reliable public CORS proxy
-      const proxiedUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+      // Using allorigins.win which is more permissive for production than corsproxy.io free tier
+      const proxiedUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
       const response = await fetch(proxiedUrl);
       
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error('Falha ao conectar com o proxy de rede.');
       }
       
-      const htmlText = await response.text();
+      const data = await response.json();
+      const htmlText = data.contents;
+      
+      if (!htmlText) {
+        throw new Error('Não foi possível obter o conteúdo da SEFAZ.');
+      }
+
       const parser = new DOMParser();
       const doc = parser.parseFromString(htmlText, 'text/html');
 
