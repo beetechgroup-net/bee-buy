@@ -3,13 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { useScanner } from '../hooks/useScanner';
 import { scraperService } from '../services/scraperService';
 import { usePurchases } from '../hooks/usePurchases';
-import { QrCode, AlertCircle, Loader2 } from 'lucide-react';
+import { QrCode, AlertCircle, Loader2, KeyRound, ChevronDown, ChevronUp } from 'lucide-react';
 
 export function ScannerPage() {
   const navigate = useNavigate();
   const { purchases, addPurchase } = usePurchases();
   const [processing, setProcessing] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [manualKey, setManualKey] = useState('');
+  const [showManual, setShowManual] = useState(false);
 
   const onScanSuccess = async (decodedText: string) => {
     // Stop scanning visually
@@ -40,6 +42,20 @@ export function ScannerPage() {
       console.error(err);
       setErrorMsg(err.message || 'Erro ao processar a nota fiscal.');
       setProcessing(false);
+    }
+  };
+
+  const handleManualSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanKey = manualKey.replace(/\D/g, '');
+    if (cleanKey.length !== 44) {
+      setErrorMsg('A chave de acesso deve ter exatamente 44 dígitos.');
+      return;
+    }
+    
+    const url = scraperService.generateUrlFromAccessKey(cleanKey);
+    if (url) {
+      onScanSuccess(url);
     }
   };
 
@@ -95,11 +111,53 @@ export function ScannerPage() {
           </div>
         </div>
       )}
+
+      {/* Manual Entry Section */}
+      <div className="w-full max-w-sm mt-6">
+        <button 
+          onClick={() => setShowManual(!showManual)}
+          className="flex items-center justify-between w-full p-4 bg-white rounded-2xl border border-gray-100 shadow-sm text-gray-700 hover:bg-gray-50 transition"
+        >
+          <div className="flex items-center gap-2 font-semibold text-sm">
+            <KeyRound className="w-4 h-4 text-amber-600" />
+            Digitar chave de acesso
+          </div>
+          {showManual ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+        </button>
+
+        {showManual && (
+          <form 
+            onSubmit={handleManualSubmit}
+            className="mt-2 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm animate-in slide-in-from-top-2"
+          >
+            <div className="flex flex-col gap-3">
+              <label htmlFor="accessKey" className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                Chave da NFC-e (44 dígitos)
+              </label>
+              <textarea 
+                id="accessKey"
+                rows={2}
+                value={manualKey}
+                onChange={(e) => setManualKey(e.target.value.replace(/\D/g, '').substring(0, 44))}
+                placeholder="Ex: 5026 0419 3727 7700 0105 6510..."
+                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition resize-none uppercase"
+              />
+              <button 
+                type="submit"
+                disabled={manualKey.length !== 44 || processing}
+                className="w-full py-3 bg-amber-600 text-white font-bold rounded-xl shadow-md hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200"
+              >
+                Identificar Nota
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
       
       {!processing && (
         <button 
           onClick={() => navigate(-1)}
-          className="mt-8 text-gray-500 font-medium py-2 px-6 rounded-full hover:bg-gray-100 transition-colors"
+          className="mt-8 mb-8 text-gray-500 font-medium py-2 px-6 rounded-full hover:bg-gray-100 transition-colors"
         >
           Cancelar
         </button>

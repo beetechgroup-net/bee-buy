@@ -7,6 +7,27 @@ import { Purchase, Product } from '../types';
  * it returns a simulated Purchase object based on the URL parameter to ensure the app is demonstratable.
  */
 export const scraperService = {
+  generateUrlFromAccessKey(key: string): string {
+    const cleanKey = key.replace(/\D/g, '');
+    if (cleanKey.length !== 44) return '';
+
+    const uf = cleanKey.substring(0, 2);
+    
+    // Portal mappings by UF
+    const portals: Record<string, string> = {
+      '35': 'https://www.nfce.fazenda.sp.gov.br/consulta?chNFe=', // SP
+      '50': 'http://www.dfe.ms.gov.br/nfce/consulta?chNFe=',      // MS
+      '33': 'https://www.fazenda.rj.gov.br/nfce/consulta?chNFe=', // RJ
+      '31': 'http://nfce.fazenda.mg.gov.br/portalnfce/sistema/consultaChaveAcesso.xhtml?p=', // MG
+      '43': 'https://www.sefaz.rs.gov.br/NFCE/NFCE-COM.aspx?p=',  // RS
+      '41': 'http://www.fazenda.pr.gov.br/nfce/consulta?p=',      // PR
+      '29': 'http://www.nfe.sefaz.ba.gov.br/servicos/nfce/modulos/geral/nfce_consulta_chave_acesso.aspx?p=' // BA
+    };
+
+    const baseUrl = portals[uf] || 'https://www.nfce.fazenda.sp.gov.br/consulta?chNFe=';
+    return `${baseUrl}${cleanKey}`;
+  },
+
   async processQRCodeUrl(url: string): Promise<Purchase> {
     // Enforce HTTPS if possible, as proxies handle it better and avoid mixed content issues
     const targetUrl = url.replace('http://', 'https://').trim();
