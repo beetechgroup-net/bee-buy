@@ -32,8 +32,8 @@ export const scraperService = {
     // Enforce HTTPS if possible, as proxies handle it better and avoid mixed content issues
     const targetUrl = url.replace('http://', 'https://').trim();
     
-    const fetchWithProxy = async (proxyUrl: string, isAllOriginsGet: boolean = false) => {
-      const response = await fetch(proxyUrl);
+    const fetchWithProxy = async (proxyUrl: string, isAllOriginsGet: boolean = false, headers: Record<string, string> = {}) => {
+      const response = await fetch(proxyUrl, { headers });
       if (!response.ok) throw new Error(`Proxy error: ${response.status}`);
       
       if (isAllOriginsGet) {
@@ -44,8 +44,10 @@ export const scraperService = {
     };
 
     const proxyOptions = [
+      { url: `/api/proxy?url=${encodeURIComponent(targetUrl)}`, isAllOriginsGet: false },
       { url: `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`, isAllOriginsGet: true },
       { url: `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`, isAllOriginsGet: false },
+      { url: `https://proxy.cors.sh/${targetUrl}`, isAllOriginsGet: false, headers: { 'x-cors-gratis': 'true' } },
       { url: `https://thingproxy.freeboard.io/fetch/${targetUrl}`, isAllOriginsGet: false },
       { url: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`, isAllOriginsGet: false }
     ];
@@ -55,7 +57,7 @@ export const scraperService = {
 
     for (const proxy of proxyOptions) {
       try {
-        htmlText = await fetchWithProxy(proxy.url, proxy.isAllOriginsGet);
+        htmlText = await fetchWithProxy(proxy.url, proxy.isAllOriginsGet, proxy.headers || {});
         if (htmlText && htmlText.length > 500) {
           break; // Success!
         }

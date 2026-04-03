@@ -4,7 +4,7 @@ import { Store, Calendar, ArrowRight, ReceiptText, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-export function Home() {
+export function PurchasesPage() {
   const { purchases, loading, clearAll } = usePurchases();
 
   const handleClearAll = () => {

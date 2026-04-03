@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { ShoppingBasket, QrCode, Search } from 'lucide-react';
+import { QrCode, Search, LayoutDashboard, History } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import packageJson from '../../package.json';
 
@@ -28,7 +28,15 @@ export function Layout({ children }: { children: ReactNode }) {
             to="/" 
             className={`flex-1 flex flex-col items-center py-3 gap-1 transition-colors ${location.pathname === '/' ? 'text-amber-600' : 'text-gray-400 hover:text-gray-600'}`}
           >
-            <ShoppingBasket className="w-6 h-6" />
+            <LayoutDashboard className="w-6 h-6" />
+            <span className="text-[10px] font-semibold uppercase tracking-wider">Dashboard</span>
+          </Link>
+
+          <Link 
+            to="/history" 
+            className={`flex-1 flex flex-col items-center py-3 gap-1 transition-colors ${location.pathname === '/history' ? 'text-amber-600' : 'text-gray-400 hover:text-gray-600'}`}
+          >
+            <History className="w-6 h-6" />
             <span className="text-[10px] font-semibold uppercase tracking-wider">Compras</span>
           </Link>
           
@@ -45,7 +53,7 @@ export function Layout({ children }: { children: ReactNode }) {
 
           <Link 
             to="/search" 
-            className={`flex-1 flex flex-col items-center py-3 gap-1 transition-colors ${location.pathname === '/search' ? 'text-amber-600' : 'text-gray-400 hover:text-gray-600'}`}
+            className={`ml-10 flex-1 flex flex-col items-center py-3 gap-1 transition-colors ${location.pathname === '/search' ? 'text-amber-600' : 'text-gray-400 hover:text-gray-600'}`}
           >
             <Search className="w-6 h-6" />
             <span className="text-[10px] font-semibold uppercase tracking-wider">Buscar</span>
