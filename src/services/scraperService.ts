@@ -8,22 +8,46 @@ import { Purchase, Product } from '../types';
  */
 export const scraperService = {
   async processQRCodeUrl(url: string): Promise<Purchase> {
-    try {
-      // Using allorigins.win which is more permissive for production than corsproxy.io free tier
-      const proxiedUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-      const response = await fetch(proxiedUrl);
+    // Enforce HTTPS if possible, as proxies handle it better and avoid mixed content issues
+    const targetUrl = url.replace('http://', 'https://');
+    
+    const fetchWithProxy = async (proxyUrl: string, isAllOrigins: boolean = false) => {
+      const response = await fetch(proxyUrl);
+      if (!response.ok) throw new Error(`Proxy error: ${response.status}`);
       
-      if (!response.ok) {
-        throw new Error('Falha ao conectar com o proxy de rede.');
+      if (isAllOrigins) {
+        const data = await response.json();
+        return data.contents;
       }
-      
-      const data = await response.json();
-      const htmlText = data.contents;
-      
-      if (!htmlText) {
-        throw new Error('Não foi possível obter o conteúdo da SEFAZ.');
-      }
+      return await response.text();
+    };
 
+    const proxyOptions = [
+      { url: `/api/proxy?url=${encodeURIComponent(targetUrl)}`, isAllOrigins: false },
+      { url: `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`, isAllOrigins: true },
+      { url: `https://thingproxy.freeboard.io/fetch/${targetUrl}`, isAllOrigins: false },
+      { url: `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`, isAllOrigins: false }
+    ];
+
+    let htmlText = '';
+    let lastError = null;
+
+    for (const proxy of proxyOptions) {
+      try {
+        htmlText = await fetchWithProxy(proxy.url, proxy.isAllOrigins);
+        if (htmlText && htmlText.length > 500) break; // Success!
+      } catch (e) {
+        lastError = e;
+        console.warn(`Proxy failed: ${proxy.url}`, e);
+        continue;
+      }
+    }
+
+    if (!htmlText) {
+      throw lastError || new Error('Não foi possível conectar com a SEFAZ através de nenhum servidor de acesso. Tente novamente mais tarde.');
+    }
+
+    try {
       const parser = new DOMParser();
       const doc = parser.parseFromString(htmlText, 'text/html');
 

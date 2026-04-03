@@ -70,12 +70,13 @@ export function ScannerPage() {
       </div>
 
       <div className="w-full max-w-sm rounded-[2rem] overflow-hidden bg-black shadow-2xl relative aspect-[4/5] flex items-center justify-center border-4 border-gray-100">
-        {!processing && (
-          <div id="reader" className="w-full h-full object-cover rounded-[2rem] overflow-hidden"></div>
-        )}
+        <div 
+          id="reader" 
+          className={`w-full h-full object-cover rounded-[2rem] overflow-hidden ${processing ? 'hidden' : 'block'}`}
+        ></div>
 
         {processing && (
-          <div className="absolute inset-0 bg-amber-900/90 flex flex-col items-center justify-center text-white z-20">
+          <div className="absolute inset-0 bg-amber-900/90 flex flex-col items-center justify-center text-white z-20 animate-in fade-in">
             <Loader2 className="w-12 h-12 mb-4 animate-spin text-amber-300" />
             <h3 className="text-xl font-bold">Lendo dados...</h3>
             <p className="text-sm text-amber-100/80 mt-2 px-8 text-center text-balance">
