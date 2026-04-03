@@ -1,17 +1,21 @@
 import { ReactNode } from 'react';
 import { ShoppingBasket, QrCode, Search } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import packageJson from '../../package.json';
 
 export function Layout({ children }: { children: ReactNode }) {
   const location = useLocation();
 
   return (
     <div className="min-h-[100dvh] bg-slate-50 flex flex-col font-sans text-slate-900 pb-20">
-      <header className="bg-white shadow-sm px-6 py-4 flex items-center justify-center sticky top-0 z-10 border-b border-gray-100">
+      <header className="bg-white shadow-sm px-6 py-4 flex flex-col items-center justify-center sticky top-0 z-10 border-b border-gray-100">
         <h1 className="text-2xl font-black tracking-tight flex items-center gap-2 text-slate-900">
           <img src="/logo.png" className="w-8 h-8 object-contain drop-shadow-sm" alt="Bee Tech" /> 
           <span className="text-amber-500">Bee</span>Buy
         </h1>
+        <span className="text-[10px] font-bold text-gray-300 uppercase tracking-[0.2em] -mt-1 ml-10">
+          v{packageJson.version}
+        </span >
       </header>
 
       <main className="flex-1 max-w-lg w-full mx-auto p-4 flex flex-col gap-4">
