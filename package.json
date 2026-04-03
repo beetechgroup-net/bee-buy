@@ -1,7 +1,7 @@
 {
   "name": "bee-buy",
   "private": true,
-  "version": "0.0.3",
+  "version": "0.0.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -23,7 +23,6 @@
     "@eslint/js": "^9.13.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
-    "@vercel/node": "^5.7.0",
     "@vitejs/plugin-react": "^4.3.3",
     "autoprefixer": "^10.4.27",
     "eslint": "^9.13.0",

@@ -9,13 +9,13 @@ import { Purchase, Product } from '../types';
 export const scraperService = {
   async processQRCodeUrl(url: string): Promise<Purchase> {
     // Enforce HTTPS if possible, as proxies handle it better and avoid mixed content issues
-    const targetUrl = url.replace('http://', 'https://');
+    const targetUrl = url.replace('http://', 'https://').trim();
     
-    const fetchWithProxy = async (proxyUrl: string, isAllOrigins: boolean = false) => {
+    const fetchWithProxy = async (proxyUrl: string, isAllOriginsGet: boolean = false) => {
       const response = await fetch(proxyUrl);
       if (!response.ok) throw new Error(`Proxy error: ${response.status}`);
       
-      if (isAllOrigins) {
+      if (isAllOriginsGet) {
         const data = await response.json();
         return data.contents;
       }
@@ -23,10 +23,10 @@ export const scraperService = {
     };
 
     const proxyOptions = [
-      { url: `/api/proxy?url=${encodeURIComponent(targetUrl)}`, isAllOrigins: false },
-      { url: `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`, isAllOrigins: true },
-      { url: `https://thingproxy.freeboard.io/fetch/${targetUrl}`, isAllOrigins: false },
-      { url: `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`, isAllOrigins: false }
+      { url: `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`, isAllOriginsGet: true },
+      { url: `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`, isAllOriginsGet: false },
+      { url: `https://thingproxy.freeboard.io/fetch/${targetUrl}`, isAllOriginsGet: false },
+      { url: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`, isAllOriginsGet: false }
     ];
 
     let htmlText = '';
@@ -34,8 +34,10 @@ export const scraperService = {
 
     for (const proxy of proxyOptions) {
       try {
-        htmlText = await fetchWithProxy(proxy.url, proxy.isAllOrigins);
-        if (htmlText && htmlText.length > 500) break; // Success!
+        htmlText = await fetchWithProxy(proxy.url, proxy.isAllOriginsGet);
+        if (htmlText && htmlText.length > 500) {
+          break; // Success!
+        }
       } catch (e) {
         lastError = e;
         console.warn(`Proxy failed: ${proxy.url}`, e);
@@ -44,7 +46,7 @@ export const scraperService = {
     }
 
     if (!htmlText) {
-      throw lastError || new Error('Não foi possível conectar com a SEFAZ através de nenhum servidor de acesso. Tente novamente mais tarde.');
+      throw lastError || new Error('O servidor da SEFAZ está demorando para responder ou o acesso foi bloqueado. Tente scanear novamente daqui a pouco.');
     }
 
     try {
