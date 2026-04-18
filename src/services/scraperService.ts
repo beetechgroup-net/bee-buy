@@ -242,11 +242,23 @@ function extractProducts(doc: Document, htmlText: string): Product[] {
         const parseNum = (selector: string) => {
           const el = row.querySelector(selector);
           if (!el) return null;
-          const text = el.textContent || "";
-          const match = text.match(/[\d,.]+/);
-          if (!match) return null;
-          let val = match[0];
-          // Handle Brazilian format
+          
+          // Pre-processing: remove labels, non-breaking spaces and symbols
+          let text = (el.textContent || "")
+            .replace(/\u00a0/g, " ") // non-breaking spaces
+            .replace(/Qtde\.:/i, "")
+            .replace(/Vl\.\s+Unit\.:/i, "")
+            .replace(/R\$/g, "")
+            .trim();
+          
+          // If we have "3 x 10,00", we want the last part or the part following labels
+          // But usually labels are already stripped. Let's get the last numeric sequence.
+          const matches = text.match(/[\d,.]+/g);
+          if (!matches || matches.length === 0) return null;
+          
+          let val = matches[matches.length - 1]; // Take the last number in case of "1 UN x 10,00"
+          
+          // Handle Brazilian format (1.250,50 -> 1250.50)
           if (val.includes(".") && val.includes(",")) {
             val = val.replace(/\./g, "").replace(",", ".");
           } else {
@@ -256,19 +268,25 @@ function extractProducts(doc: Document, htmlText: string): Product[] {
         };
 
         const quantity = parseNum(".Rqtd") || 1;
+        // The .valor class usually contains the total for the item line in newer layouts
+        const itemTotal = parseNum(".valor");
         const unitPrice = parseNum(".RvlUnit") || 0;
+        
+        // Final price: Prefer itemTotal if available, fallback to unitPrice * quantity
+        const finalPrice = itemTotal !== null ? itemTotal : (unitPrice * quantity);
+
         const unit =
           row.querySelector(".RUN")?.textContent?.replace(/.*:/, "")?.trim() ||
           "UN";
         const code =
           row.querySelector(".RCod")?.textContent?.match(/\d+/)?.[0] || "";
 
-        if (unitPrice > 0 || name.length > 2) {
+        if (finalPrice > 0 || name.length > 2) {
           products.push({
             id: crypto.randomUUID(),
             name,
             quantity,
-            price: unitPrice,
+            price: finalPrice,
             unit,
             code: code || undefined,
           });
@@ -280,13 +298,14 @@ function extractProducts(doc: Document, htmlText: string): Product[] {
   // Regex fallback for products if the table was not parsed correctly
   if (products.length === 0) {
     // Try to find product blocks in raw HTML (common in JSF/XSLT results)
+    // Updated regex to handle .valor and .RvlUnit variations
     const productRegex =
-      /<span class="txtTit">([^<]+)<\/span>.*?class="Rqtd">.*?(\d+(?:,\d+)?)<\/span>.*?class="RvlUnit">.*?(\d+(?:,\d+)?)<\/span>/gs;
+      /<span class="txtTit">([^<]+)<\/span>.*?class="Rqtd">.*?([\d,.]+).*?class="(?:RvlUnit|valor)">.*?([\d,.]+)/gs;
     let match;
     while ((match = productRegex.exec(htmlText)) !== null) {
       const name = match[1].trim();
-      const quantity = parseFloat(match[2].replace(",", "."));
-      const price = parseFloat(match[3].replace(",", "."));
+      const quantity = parseFloat(match[2].replace(".", "").replace(",", "."));
+      const price = parseFloat(match[3].replace(".", "").replace(",", "."));
       if (name && !isNaN(price)) {
         products.push({
           id: crypto.randomUUID(),
