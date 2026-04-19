@@ -18,11 +18,23 @@ export function ScannerPage() {
     setProcessing(true);
     setErrorMsg(null);
     try {
-      if (!decodedText.includes('http')) {
-        throw new Error('QR Code não contém uma URL válida de NFC-e.');
+      let normalizedUrl = decodedText.trim();
+      
+      // 1. Check if it's just a 44-digit access key (numeric or with spaces)
+      const cleanKey = normalizedUrl.replace(/\s/g, '');
+      if (/^\d{44}$/.test(cleanKey)) {
+        normalizedUrl = scraperService.generateUrlFromAccessKey(cleanKey);
+      } 
+      // 2. Check if it starts with query parameters like p= or chNFe=
+      else if (normalizedUrl.startsWith('p=') || normalizedUrl.startsWith('chNFe=')) {
+        normalizedUrl = `http://www.dfe.ms.gov.br/nfce/consulta?${normalizedUrl}`;
+      }
+      // 3. Last resort validation
+      else if (!normalizedUrl.toLowerCase().includes('http')) {
+        throw new Error('O código lido não parece ser uma URL ou chave de acesso válida de NFC-e.');
       }
       
-      const purchase = await scraperService.processQRCodeUrl(decodedText);
+      const purchase = await scraperService.processQRCodeUrl(normalizedUrl);
       
       // Verificar duplicidade pela chave de acesso (se não for a mockada 'UNKNOWN_KEY')
       const isUnknown = purchase.accessKey === 'UNKNOWN_KEY';

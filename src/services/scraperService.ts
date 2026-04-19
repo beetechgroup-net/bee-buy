@@ -167,8 +167,9 @@ export const scraperService = {
         doc.querySelector(".txtChave");
       const accessKey =
         accessKeyElement?.textContent?.replace(/\D/g, "") ||
-        url.match(/p=(\d{44})/)?.[1] ||
-        url.match(/p=(\d{44})/)?.[1];
+        url.match(/chNFe=([^|&]{44})/i)?.[1] ||
+        url.match(/p=([^|&]{44})/i)?.[1] ||
+        url.match(/[p|chNFe]=(\d{44})/i)?.[1];
 
       // Extract emission date (Format: DD/MM/YYYY HH:MM:SS)
       const dateMatch =
@@ -268,25 +269,27 @@ function extractProducts(doc: Document, htmlText: string): Product[] {
         };
 
         const quantity = parseNum(".Rqtd") || 1;
-        // The .valor class usually contains the total for the item line in newer layouts
         const itemTotal = parseNum(".valor");
-        const unitPrice = parseNum(".RvlUnit") || 0;
+        const extractedUnitPrice = parseNum(".RvlUnit");
         
-        // Final price: Prefer itemTotal if available, fallback to unitPrice * quantity
-        const finalPrice = itemTotal !== null ? itemTotal : (unitPrice * quantity);
+        // Ensure price is ALWAYS the unit price
+        // Prefer extracted unit price, fallback to total divided by quantity
+        const unitPrice = extractedUnitPrice !== null 
+          ? extractedUnitPrice 
+          : (itemTotal !== null ? itemTotal / quantity : 0);
 
-        const unit =
-          row.querySelector(".RUN")?.textContent?.replace(/.*:/, "")?.trim() ||
-          "UN";
+        const unitRaw = row.querySelector(".RUN")?.textContent?.replace(/.*:/, "") || "";
+        const unitMatch = unitRaw.match(/[a-zA-Z]+/);
+        const unit = unitMatch ? unitMatch[0].toUpperCase() : "UN";
         const code =
           row.querySelector(".RCod")?.textContent?.match(/\d+/)?.[0] || "";
 
-        if (finalPrice > 0 || name.length > 2) {
+        if (unitPrice > 0 || name.length > 2) {
           products.push({
             id: crypto.randomUUID(),
             name,
             quantity,
-            price: finalPrice,
+            price: unitPrice,
             unit,
             code: code || undefined,
           });
@@ -304,14 +307,21 @@ function extractProducts(doc: Document, htmlText: string): Product[] {
     let match;
     while ((match = productRegex.exec(htmlText)) !== null) {
       const name = match[1].trim();
-      const quantity = parseFloat(match[2].replace(".", "").replace(",", "."));
-      const price = parseFloat(match[3].replace(".", "").replace(",", "."));
-      if (name && !isNaN(price)) {
+      const quantity = parseFloat(match[2].replace(/\./g, "").replace(",", "."));
+      const priceRaw = parseFloat(match[3].replace(/\./g, "").replace(",", "."));
+      
+      // For the regex fallback, we need to guess if the price matched is unit or total
+      // Usually the class matched is either RvlUnit or valor. 
+      // If the match was 'valor', we divide by quantity to get unit price.
+      const isTotal = htmlText.includes(`class="valor">${match[3]}`);
+      const unitPrice = isTotal ? (priceRaw / (quantity || 1)) : priceRaw;
+
+      if (name && !isNaN(unitPrice)) {
         products.push({
           id: crypto.randomUUID(),
           name,
           quantity: isNaN(quantity) ? 1 : quantity,
-          price,
+          price: unitPrice,
           unit: "UN",
         });
       }
